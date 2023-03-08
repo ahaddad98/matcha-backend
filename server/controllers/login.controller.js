@@ -1,7 +1,6 @@
 //For Register Page
 const registerView = (req, res) => {
-    res.render("register", {
-    } );
+    res.send("register")
 }
 // For View 
 const loginView = (req, res) => {
