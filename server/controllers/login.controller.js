@@ -1,12 +1,10 @@
 //For Register Page
 const registerView = (req, res) => {
-    res.send("register")
+    return res.send("register")
 }
 // For View 
 const loginView = (req, res) => {
-
-    res.render("login", {
-    } );
+    return res.send("login");
 }
 module.exports =  {
     registerView,
