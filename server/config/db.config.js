@@ -1,11 +1,14 @@
-const Pool = require("pg").Pool
+const { Client } = require('pg');
 
-const pool = new Pool({
-    user: DB_USER,
-    password :DB_PASSWORD,
-    host: DB_HOST,
-    port: DB_PORT,
-    database: DB_NAME,
-  }) = process.env;
-  
-  module.exports = pool
+const dbConfig = {
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME
+};
+const pool = new Client(dbConfig);
+pool.connect().then(()=>{console.log("succes");}).catch((error)=>{console.log(error);})
+
+
+module.exports = pool;
