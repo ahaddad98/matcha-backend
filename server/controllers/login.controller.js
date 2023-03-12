@@ -1,5 +1,6 @@
 //For Register Page
 const pool = require("../config/db.config");
+const bcrypt = require("bcrypt")
 
 const insertUserQuery = `
   INSERT INTO "user" (first_name, last_name, username, email, password)
@@ -21,15 +22,12 @@ function createUser(values) {
 const registerView = (req, res) => {
   const { first_name, last_name, username, email, password } = req.body;
 
-  const values = [first_name, last_name, username, email, password];
+  const values = [first_name, last_name, username, email, bcrypt(password)];
   createUser(values).then(user => {
-    console.log('User created:', user);
-    // Send the user data as a response to the client
     res.status(201).json(user);
   })
   .catch(err => {
     console.error('Error creating user:', err);
-    // Send an error response to the client
     res.status(500).json({ error: 'Error creating user' });
   });
 };
