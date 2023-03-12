@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const pool = require('./config/db.config');
 //engine to use embeded js 
+app.use(express.json())
 // app.set('view engine', 'ejs');
 app.use('/', require('./routes/login'));
 app.use(require('./routes/error'));
