@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const expressJwt = require("express-jwt");
 
 const getUsersQuery = `
-    SELECT *
+    SELECT id,first_name, last_name, username, email
     FROM "user"
 `;
 
@@ -21,7 +21,10 @@ function getUsersdata(params) {
 
 const getUsers = (req, res) => {
   getUsersdata().then((user) => {
+    delete user.password
     res.status(200).json(user);
+  }).catch((e) => {
+    res.status(400).json({ error: "Error geting users" });
   });
 };
 
@@ -47,6 +50,7 @@ function getUsersByIdData (id) {
 const getUsersById = (req, res) => {
   const id = req.params.id;
   getUsersByIdData(id).then(user => {
+    delete user.password
     res.status(200).json(user)
   }).catch(e => {
     res.status(400).json({ error: "Error searching user" });
