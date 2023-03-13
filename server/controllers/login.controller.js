@@ -1,13 +1,29 @@
 const pool = require("../config/db.config");
 const bcrypt = require("bcrypt");
-const { use } = require("../routes/login");
+const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
+const expressJwt = require("express-jwt");
+const JWT_SECRET = crypto.randomBytes(32).toString("hex");
 
 const searchUserQuery = `
-    SELECT * 
-    FROM "user" 
-    WHERE username = $1;
+SELECT * 
+FROM "user" 
+WHERE username = $1;
 `;
 
+const generateToken = (user) => {
+  const payload = {
+    id: user.id,
+    email: user.email,
+  };
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+  return token;
+};
+
+const verifyToken = expressJwt.expressjwt({
+  secret: JWT_SECRET,
+  algorithms: ["HS256"],
+});
 function searchUser(values) {
   console.log(values);
   return new Promise((resolve, reject) => {
@@ -29,18 +45,21 @@ const loginView = (req, res) => {
   const { username, password } = req.body;
   searchUser([username])
     .then((user) => {
-        bcrypt.compare(password, user.password , (err , resp ) => {
-            if (err) {
-                
-            }
-            else if (resp) {
-                delete user.password
-                res.status(200).json(user);
-            }
-            else {
-
-            }
-        })
+      bcrypt.compare(password, user.password, (err, resp) => {
+        if (err) {
+        } else if (resp) {
+          delete user.password;
+          const accessToken = jwt.sign({ sub: username }, JWT_SECRET, {
+            expiresIn: "3h",
+          });
+          const refreshToken = jwt.sign({ sub: username }, JWT_SECRET, {
+            expiresIn: "2w",
+          });
+          //   const token = generateToken(user);
+          res.status(200).json({ user, accessToken, refreshToken });
+        } else {
+        }
+      });
     })
     .catch((err) => {
       console.log(err);
