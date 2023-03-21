@@ -56,6 +56,27 @@ const getUsersById = (req, res) => {
     res.status(400).json({ error: "Error searching user" });
   })
 };
+
+const deleteUserQuery =`
+  DELETE FROM "user"
+  WHERE id=$1
+`
+let newPictures = false;
+let oldGender = false;
+let sexualPreferences = false;
+let biography = false;
+let interests = false;
+const updateUserQuery = `
+  UPDATE "user"
+  SET 
+    ${newPictures ? 'pictures=$2,' : ''}
+    ${oldGender !== undefined ? 'gender=$3,' : ''}
+    ${sexualPreferences ? 'sexual_preferences=$4,' : ''}
+    ${biography ? 'biography=$5,' : ''}
+    ${interests ? 'interests=$6,' : ''}
+  WHERE id=$1
+`;
+
 module.exports = {
   getUsers,
   getUsersById,
