@@ -1,5 +1,5 @@
 const express = require('express');
-const {getUsers, getUsersById} = require('../controllers/user.contoller')
+const {getUsers, getUsersById, patchUser} = require('../controllers/user.contoller')
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -18,5 +18,6 @@ function verifyToken(req, res, next) {
   }
 router.get('/', getUsers);
 router.get('/:id', getUsersById);
+router.patch('/:id', patchUser);
 // router.post('/:id', loginView);
 module.exports = router;
