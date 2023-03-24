@@ -174,5 +174,6 @@ const patchUser = (req, res) => {
 module.exports = {
   getUsers,
   getUsersById,
-  patchUser
+  patchUser,
+  getUsersByIdData
 };

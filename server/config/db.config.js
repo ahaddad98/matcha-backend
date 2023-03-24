@@ -23,10 +23,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     biography TEXT,
     interests TEXT[],
     profile_picture VARCHAR(255),
-    picture_1 VARCHAR(255),
-    picture_2 VARCHAR(255),
-    picture_3 VARCHAR(255),
-    picture_4 VARCHAR(255)
+    pictures VARCHAR(255)[4]
 );
 `;
 
