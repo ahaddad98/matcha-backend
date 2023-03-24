@@ -61,85 +61,80 @@ const deleteUserQuery = `
   DELETE FROM "user"
   WHERE id=$1
 `
-// let newPictures = false;
-var oldGender = false;
-var sexualPreferences = true;
-var biography_ = false;
-var interests_ = false;
-
-const updateUserQuery = (gender, sexual_preferences, biography, interests) => {
-  var set = sexual_preferences ? 'sexual_preferences=$3,' : ''
-  set += gender ? 'gender=$2,' : ''
-  set += biography ? 'biography=$4,' : ''
-  set += interests ? 'interests=$5,' : ''
-  set = set.slice(0, -1)
-  return `
-  UPDATE "user"
-  SET 
-   ${set}
-  WHERE id=$1;
-  `;
-}
 
 function patchUsersById(id, query, values) {
   return new Promise((resolve, reject) => {
-    console.log(values);
-    console.log(query);
     pool.query(query, values,(err, res) => {
-      console.log(err, res);
-      if (err) {
+      if (err  || !res.rowCount) {
         reject(err)
       }
       if (res) {
-        resolve(res)
+        getUsersByIdData(id).then(user =>  resolve(user)).catch(e => console.log(e))
       }
     })
   })
 }
 
+
 const patchUser = (req, res) => {
-  const id = req.params.id;
-  const requestBody = req.body;
-  let query = 'UPDATE "user" SET';
+  getUsersByIdData(req.params.id).then(user => {
+    const requestBody = req.body;
+    let query = 'UPDATE "user" SET';
 
-  const values = [];
+    const values = [];
 
-  if (requestBody.hasOwnProperty('gender')) {
-    query += ' gender = $1,';
-    values.push(requestBody.gender);
-  }
-
-  if (requestBody.hasOwnProperty('sexual_preferences')) {
-    query += ' sexual_preferences = $2,';
-    values.push(requestBody.sexual_preferences);
-  }
-
-  if (requestBody.hasOwnProperty('biography')) {
-    query += ' biography = $3,';
-    values.push(requestBody.biography);
-  }
-
-  if (requestBody.hasOwnProperty('interests')) {
-    const interests = requestBody.interests;
-    if (!Array.isArray(interests)) {
-      console.log('Interests is not an array:', interests);
-      return res.status(400).json({ error: 'Invalid interests' });
+    if (requestBody.hasOwnProperty('gender')) {
+      query += ' gender = $1,';
+      values.push(requestBody.gender);
     }
-    query += ' interests = $4,';
-    values.push(interests);
-  }
+    else if (!requestBody.hasOwnProperty('gender')) {
+      query += ' gender = $1,';
+      values.push(user.gender);
+    }
+    if (requestBody.hasOwnProperty('sexual_preferences')) {
+      query += ' sexual_preferences = $2,';
+      values.push(requestBody.sexual_preferences);
+    }
+    else if (!requestBody.hasOwnProperty('sexual_preferences')) {
+      query += ' sexual_preferences = $2,';
+      values.push(user.sexual_preferences);
+    }
+    if (requestBody.hasOwnProperty('biography')) {
+      query += ' biography = $3,';
+      values.push(requestBody.biography);
+    }
+    else {
+      query += ' biography = $3,';
+      values.push(user.biography);
+    }
+    if (requestBody.hasOwnProperty('interests')) {
+      const interests = requestBody.interests;
+      if (!Array.isArray(interests)) {
+        return res.status(400).json({ error: 'Invalid interests' });
+      }
+      query += ' interests = $4,';
+      values.push(interests);
+    }
+    else {
+      const interests = user.interests;
+      if (!Array.isArray(interests)) {
+        return res.status(400).json({ error: 'Invalid interests' });
+      }
+      query += ' interests = $4,';
+      values.push(interests);
+    }
+    query = query.slice(0, -1);
 
-  // Remove trailing comma from query
-  query = query.slice(0, -1);
-
-  query += ' WHERE id = $5';
-  values.push(id)
-  patchUsersById(id, query, values).then(user => {
-    delete user.password
-    res.status(200).json(user)
-  }).catch(e => {
-    console.log(e);
-    res.status(400).json({ error: "Error searching user" });
+    query += ' WHERE id = $5';
+    values.push(user.id)
+    patchUsersById(req.params.id, query, values).then(user => {
+      delete user.password
+      console.log(user);
+      res.status(200).json(user)
+    }).catch(e => {
+      console.log(e);
+      res.status(400).json({ error: "Error searching user" });
+    })
   })
 
 }
