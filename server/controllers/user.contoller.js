@@ -116,17 +116,49 @@ const patchUser = (req, res) => {
       values.push(interests);
     }
     else {
-      const interests = user.interests;
+      const interests = user.interests ? user.interests : [];
       if (!Array.isArray(interests)) {
         return res.status(400).json({ error: 'Invalid interests' });
       }
       query += ' interests = $4,';
       values.push(interests);
     }
-    query = query.slice(0, -1);
-
-    query += ' WHERE id = $5';
     values.push(user.id)
+    if (requestBody.hasOwnProperty('first_name')) {
+      query += ' first_name = $6,';
+      values.push(requestBody.first_name);
+    }
+    else {
+      query += ' first_name = $6,';
+      values.push(user.first_name);
+    }
+    if (requestBody.hasOwnProperty('last_name')) {
+      query += ' last_name = $7,';
+      values.push(requestBody.last_name);
+    }
+    else {
+      query += ' last_name = $7,';
+      values.push(user.last_name);
+    }
+    if (requestBody.hasOwnProperty('username')) {
+      query += ' username = $8,';
+      values.push(requestBody.username);
+    }
+    else {
+      query += ' username = $8,';
+      values.push(user.username);
+    }
+    if (requestBody.hasOwnProperty('email')) {
+      query += ' email = $9,';
+      values.push(requestBody.email);
+    }
+    else {
+      query += ' email = $9,';
+      values.push(user.email);
+    }
+    query = query.slice(0, -1);
+    query += ' WHERE id = $5';
+    
     patchUsersById(req.params.id, query, values).then(user => {
       delete user.password
       console.log(user);
