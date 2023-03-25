@@ -156,6 +156,30 @@ const patchUser = (req, res) => {
       query += ' email = $9,';
       values.push(user.email);
     }
+    if (requestBody.hasOwnProperty('latitude')) {
+      query += ' latitude = $10,';
+      values.push(requestBody.latitude);
+    }
+    else {
+      query += ' latitude = $10,';
+      values.push(user.latitude);
+    }
+    if (requestBody.hasOwnProperty('longitude')) {
+      query += ' longitude = $11,';
+      values.push(requestBody.longitude);
+    }
+    else {
+      query += ' longitude = $11,';
+      values.push(user.longitude);
+    }
+    if (requestBody.hasOwnProperty('birthday')) {
+      query += ' birthday = $12,';
+      values.push(requestBody.birthday);
+    }
+    else {
+      query += ' birthday = $12,';
+      values.push(user.birthday);
+    }
     query = query.slice(0, -1);
     query += ' WHERE id = $5';
     
