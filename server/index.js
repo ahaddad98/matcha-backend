@@ -9,5 +9,10 @@ app.use('/', require('./routes/login'));
 app.use('/users', require('./routes/user'));
 app.use(require('./routes/error'));
 
-const PORT = process.env.NODE_DOCKER_PORT ||  3000;
+const PORT = process.env.NODE_DOCKER_PORT ||  4000;
 app.listen(PORT, console.log("Server don start for port: " + PORT))
+/*
+SELECT *
+FROM users
+WHERE acos(sin(:lat)*sin(radians(latitude)) + cos(:lat)*cos(radians(latitude))*cos(radians(longitude)-:lng)) * 6371 <= 1;
+*/

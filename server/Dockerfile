@@ -1,8 +1,10 @@
-FROM node:14
-
-WORKDIR /bezkoder-app
-COPY package.json .
+FROM node:16
+RUN mkdir server
+COPY package.json ./server
+COPY . ./server
+COPY *. ./server
+WORKDIR /server
+RUN rm -rf node_modules
 RUN npm install
 RUN npm install -g nodemon
-COPY . .
-CMD tail -f /dev/null
+CMD npm start

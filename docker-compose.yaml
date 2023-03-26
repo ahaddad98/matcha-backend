@@ -1,9 +1,8 @@
 version: "3.3"
 
 services:
-  matcha_db:
+  postgres:
     image: postgres:13.3
-    restart: unless-stopped
     env_file: ./.env
     environment:
       - POSTGRES_USER=postgres
@@ -13,21 +12,18 @@ services:
       - $POSTGRES_LOCAL_PORT:$POSTGRES_DOCKER_PORT
     volumes:
       - dbtet:/var/lib/postgresql/data
-  # app:
-  #   depends_on:
-  #     - postgres
-  #   build: ./server
-  #   restart: unless-stopped
-  #   env_file: ./.env
-  #   ports:
-  #     - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-  #   environment:
-  #     - DB_HOST=postgres
-  #     - DB_USER=$POSTGRES_USER
-  #     - DB_PASSWORD=$POSTGRES_PASSWORD
-  #     - DB_NAME=$POSTGRES_DATABASE
-  #     - DB_PORT=$POSTGRES_DOCKER_PORT
-  #   stdin_open: true
-  #   tty: true
+  app:
+    depends_on:
+      - postgres
+    build: ./server
+    env_file: ./.env
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=$POSTGRES_USER
+      - DB_PASSWORD=$POSTGRES_PASSWORD
+      - DB_NAME=$POSTGRES_DATABASE
+      - DB_PORT=$POSTGRES_DOCKER_PORT
 volumes:
   dbtet:
