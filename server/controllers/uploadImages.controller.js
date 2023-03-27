@@ -27,10 +27,9 @@ const upload = multer({
 // const upload = multer({ dest: "upload" , limits: { fileSize: 1024 * 1024 * 10 }});
 
 const updateQuery = `
-  UPDATE "user"
-  SET profile_picture = $1,
-      pictures = $2
-  WHERE id = $3
+  INSERT INTO "pictures"
+  (user_id, url)
+  VALUES ($2, $1);
 `;
 
 function patchImagessById(id, values) {
@@ -50,26 +49,24 @@ function patchImagessById(id, values) {
 
 const patchImages = (req, res) => {
   const { id } = req.params;
-  console.log(req.files);
-  const { profile_picture, pictures } = req.files;
-  const profilePicturePath = profile_picture
-    ? path.join(__dirname, profile_picture[0].path)
-    : null;
-  const picturePaths = pictures
-    ? pictures.map((pic) => path.join(__dirname, pic.path))
-    : [];
-  
-  //updateQuery, [profilePicturePath, picturePaths, id]
-  patchImagessById(id, [profilePicturePath, picturePaths, id])
-    .then((user) => {
-      delete user.password;
-      // console.log(user);
-      res.status(200).json(user);
-    })
-    .catch((e) => {
-      console.log(e);
-      res.status(400).json({ error: "Error searching user" });
-    });
+  getUsersByIdData(id).then((user) => {
+    const { profile_picture, pictures } = req.files;
+    const profilePicturePath = profile_picture
+      ? path.join(__dirname, profile_picture[0].filename)
+      : user.profile_picture;
+    const picturePaths = pictures
+      ? pictures.map((pic) => path.join(__dirname, pic.filename))
+      : null;
+    patchImagessById(id, [picturePaths, id])
+      .then((user) => {
+        delete user.password;
+        res.status(200).json(user);
+      })
+      .catch((e) => {
+        console.log(e);
+        res.status(400).json({ error: "Error searching user" });
+      });
+  });
 };
 
 module.exports = {

@@ -36,9 +36,7 @@ function searchUser(values) {
     });
   });
 }
-const hashpass = async (password) => {
-  return await bcrypt.hash(password, 10);
-};
+
 const loginView = (req, res) => {
   const { username, password } = req.body;
   searchUser([username])
@@ -47,10 +45,10 @@ const loginView = (req, res) => {
         if (err) {
         } else if (resp) {
           delete user.password;
-          const accessToken = jwt.sign({ sub: username }, JWT_SECRET, {
+          const accessToken = jwt.sign({ sub: username, id: user.id }, JWT_SECRET, {
             expiresIn: "3h",
           });
-          const refreshToken = jwt.sign({ sub: username }, JWT_SECRET, {
+          const refreshToken = jwt.sign({ sub: username, id: user.id}, JWT_SECRET, {
             expiresIn: "2w",
           });
           //   const token = generateToken(user);
