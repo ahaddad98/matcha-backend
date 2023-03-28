@@ -29,14 +29,22 @@ const getUsers = (req, res) => {
 };
 
 const getUsersByIdQuery = `
-SELECT *
-FROM "user"
-WHERE id=$1;
+SELECT * FROM pictures
+JOIN "user" ON  pictures.user_id = $1
+`;
+
+const getUsersWithPicturesQuery = `
+SELECT "user".id, "user".*, (
+  SELECT json_agg(pictures.*)
+  FROM "pictures"
+  WHERE pictures.user_id = $1
+) AS pictures
+FROM "user";
 `;
 
 function getUsersByIdData(id) {
   return new Promise((resolve, reject) => {
-    pool.query(getUsersByIdQuery, [id], (err, res) => {
+    pool.query(getUsersWithPicturesQuery, [id], (err, res) => {
       if (err || res.rows.length === 0) {
         reject(err)
       }
@@ -53,6 +61,7 @@ const getUsersById = (req, res) => {
     delete user.password
     res.status(200).json(user)
   }).catch(e => {
+    console.log(e);
     res.status(400).json({ error: "Error searching user" });
   })
 };
