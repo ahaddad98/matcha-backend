@@ -34,6 +34,7 @@ const updateQuery = `
 
 function patchImagessById(id, values) {
   return new Promise((resolve, reject) => {
+    console.log(values);
     pool.query(updateQuery, values, (err, res) => {
       if (err || !res.rowCount) {
         reject(err);
@@ -52,10 +53,11 @@ const patchImages = (req, res) => {
   getUsersByIdData(id).then((user) => {
     const { profile_picture, pictures } = req.files;
     const profilePicturePath = profile_picture
-      ? path.join(__dirname, profile_picture[0].filename)
+      ? path.join(profile_picture[0].filename)
       : user.profile_picture;
+      console.log(pictures);
     const picturePaths = pictures
-      ? pictures.map((pic) => path.join(__dirname, pic.filename))
+      ? pictures.map((pic) => pic.filename)
       : null;
     patchImagessById(id, [picturePaths, id])
       .then((user) => {
