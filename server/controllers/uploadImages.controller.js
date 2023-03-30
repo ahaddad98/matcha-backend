@@ -32,11 +32,32 @@ const updateQuery = `
   VALUES ($2, $1);
 `;
 
+const updateProfilePicQuery = `
+  UPDATE "user" 
+  SET profile_picture = $2
+  WHERE id=$1; 
+`;
+
 function patchImagessById(id, values) {
   return new Promise((resolve, reject) => {
     console.log(values);
     pool.query(updateQuery, values, (err, res) => {
       if (err || !res.rowCount) {
+        reject(err);
+      }
+      if (res) {
+        getUsersByIdData(id)
+          .then((user) => resolve(user))
+          .catch((e) => console.log(e));
+      }
+    });
+  });
+}
+function patchProfilePicsById(id, values) {
+  return new Promise((resolve, reject) => {
+    // console.log(values);
+    pool.query(updateProfilePicQuery, values, (err, res) => {
+      if (err) {
         reject(err);
       }
       if (res) {
@@ -54,20 +75,31 @@ const patchImages = (req, res) => {
     const { profile_picture, pictures } = req.files;
     const profilePicturePath = profile_picture
       ? path.join(profile_picture[0].filename)
-      : user.profile_picture;
-      console.log(pictures);
+      : null;
     const picturePaths = pictures
       ? pictures.map((pic) => pic.filename)
       : null;
-    patchImagessById(id, [picturePaths, id])
+    if (profilePicturePath) {
+      patchProfilePicsById(id, [id, profilePicturePath])
+        .then((user) => {
+          delete user.password;
+          res.status(200).json(user);
+        })
+        .catch((e) => {
+          res.status(400).json({ error: "Error searching user" });
+        });
+    }
+    if (picturePaths)
+    {
+      patchImagessById(id, [picturePaths, id])
       .then((user) => {
         delete user.password;
         res.status(200).json(user);
       })
       .catch((e) => {
-        console.log(e);
         res.status(400).json({ error: "Error searching user" });
       });
+    }
   });
 };
 
