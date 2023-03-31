@@ -10,6 +10,7 @@ const {
   patchImages,
   upload,
 } = require("../controllers/uploadImages.controller");
+const { searchUser } = require("../controllers/searchUser.controller");
 const JWT_SECRET = process.env.JWT_SECRET;
 function verifyToken(req, res, next) {
   const token = req.headers.authorization;
@@ -29,6 +30,7 @@ function verifyToken(req, res, next) {
 }
 router.get("/", verifyToken, getUsers);
 router.get("/:id", getUsersById);
+router.get("/search", searchUser);
 router.patch("/:id", patchUser);
 router.patch(
   "/pictures/:id",
