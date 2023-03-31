@@ -39,9 +39,10 @@ function patchImagessById(values) {
 
 
 const searchUser = (req, res) => {
-    const {distance , age, username, interests} = req.body
-    console.log(distance , age, username, interests);
-    res.status(400).json({ error: "Error searching user" });
+    console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
+    // const {distance , age, username, interests} = req.body
+    // console.log(distance , age, username, interests);
+    // res.status(400).json({ error: "Error searching user" });
 
     // patchImagessById(id, [])
     //     .then((user) => {
