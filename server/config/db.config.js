@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS "user" (
     interests TEXT[],
     profile_picture VARCHAR(255),
     pictures VARCHAR(255)[4],
-    latitude DOUBLE PRECISION,
-    longitude DOUBLE PRECISION,
+    latitude VARCHAR(255),
+    longitude VARCHAR(255),
     birthday DATE
 );
 `;

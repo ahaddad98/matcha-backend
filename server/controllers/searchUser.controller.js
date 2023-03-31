@@ -4,7 +4,7 @@ const { getUsersByIdData } = require("./user.contoller");
 
 const updateQuery = `
   SELECT * FROM "user"
-  WHERE username=$1 age=$2;
+  WHERE username=$1;
 `;
 /*
 ======================== to search with the birthdate
@@ -21,38 +21,32 @@ SELECT * FROM users
 WHERE 'programming' = ANY (users.interests);
 */
 
-
-function patchImagessById(values) {
-    return new Promise((resolve, reject) => {
-        pool.query(updateQuery, values, (err, res) => {
-            if (err || !res.rowCount) {
-                reject(err);
-            }
-            if (res) {
-                getUsersByIdData(id)
-                    .then((user) => resolve(user))
-                    .catch((e) => console.log(e));
-            }
-        });
+function searchUsersBySomethings(values) {
+  return new Promise((resolve, reject) => {
+    pool.query(updateQuery, values, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      if (res) {
+        resolve(res.rows)
+      }
     });
+  });
 }
 
-
 const searchUser = (req, res) => {
-    console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
-    // const {distance , age, username, interests} = req.body
-    // console.log(distance , age, username, interests);
-    // res.status(400).json({ error: "Error searching user" });
-
-    // patchImagessById(id, [])
-    //     .then((user) => {
-    //         delete user.password;
-    //         res.status(200).json(user);
-    //     })
-    //     .catch((e) => {
-    //     });
+  console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", req.body);
+  const { distance, age, username, interests , first_name} = req.body;
+  searchUsersBySomethings([first_name])
+    .then((user) => {
+    //   delete user.password;
+      res.status(200).json(user);
+    })
+    .catch((e) => {
+      res.status(400).json({ error: "Error searching user" });
+    });
 };
 
 module.exports = {
-    searchUser
+  searchUser,
 };

@@ -39,7 +39,9 @@ SELECT "user".id, "user".*, (
   FROM "pictures"
   WHERE pictures.user_id = $1
 ) AS pictures
-FROM "user";
+FROM "user"
+WHERE id = $1
+;
 `;
 
 function getUsersByIdData(id) {

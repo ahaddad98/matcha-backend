@@ -40,9 +40,8 @@ const updateProfilePicQuery = `
 
 function patchImagessById(id, values) {
   return new Promise((resolve, reject) => {
-    console.log(values);
     pool.query(updateQuery, values, (err, res) => {
-      if (err || !res.rowCount) {
+      if (err) {
         reject(err);
       }
       if (res) {
@@ -76,9 +75,7 @@ const patchImages = (req, res) => {
     const profilePicturePath = profile_picture
       ? path.join(profile_picture[0].filename)
       : null;
-    const picturePaths = pictures
-      ? pictures.map((pic) => pic.filename)
-      : null;
+    const picturePaths = pictures ? pictures.map((pic) => pic.filename) : [];
     if (profilePicturePath) {
       patchProfilePicsById(id, [id, profilePicturePath])
         .then((user) => {
@@ -89,16 +86,26 @@ const patchImages = (req, res) => {
           res.status(400).json({ error: "Error searching user" });
         });
     }
-    if (picturePaths)
-    {
-      patchImagessById(id, [picturePaths, id])
-      .then((user) => {
-        delete user.password;
-        res.status(200).json(user);
-      })
-      .catch((e) => {
-        res.status(400).json({ error: "Error searching user" });
-      });
+    if (picturePaths.length) {
+      let promises = [];
+      for (let index = 0; index < picturePaths.length; index++) {
+        promises.push(patchImagessById(id, [picturePaths[index], id]));
+        // patchImagessById(id, [picturePaths[index], id])
+      }
+      let userData;
+
+      Promise.all(promises)
+        .then((users) => {
+          userData = users[0];
+          delete userData.password;
+        })
+        .catch((e) => {
+          res.status(400).json({ error: "Error searching user" });
+        })
+        .finally(() => {
+          console.log(userData);
+          res.status(200).json(userData);
+        });
     }
   });
 };
