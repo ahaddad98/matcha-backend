@@ -20,8 +20,7 @@ function verifyToken(req, res, next) {
   }
   try {
     const decoded = jwt.verify(token.split(' ')[1], JWT_SECRET);
-    req.user = decoded.user;
-    console.log(req.user);
+    req['user_id'] = decoded.id;
     next();
   } catch (err) {
     console.log(err);
@@ -29,7 +28,7 @@ function verifyToken(req, res, next) {
   }
 }
 router.get("/", verifyToken, getUsers);
-router.get("/search", searchUser);
+router.get("/search", verifyToken, searchUser);
 router.get("/:id", getUsersById);
 router.patch("/:id", patchUser);
 router.patch(

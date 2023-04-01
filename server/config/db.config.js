@@ -56,6 +56,7 @@ pool.query(createUserTableQuery, (err, res) => {
     console.log("User table created successfully");
   }
 });
+
 pool.query(CretaePictureQuery, (err, res) => {
   if (err) {
     console.error(err);
