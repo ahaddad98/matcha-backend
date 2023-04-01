@@ -10,7 +10,7 @@ const dbConfig = {
 const pool = new Client(dbConfig);
 pool
   .connect()
-  .then(() => {})
+  .then(() => { })
   .catch((error) => {
     console.log(error);
   });
@@ -49,6 +49,14 @@ const picQuery = `
   HAVING COUNT(p.id) < 4;
 `;
 
+const user_likes = `
+  CREATE TABLE IF NOT EXISTS user_likes (
+  user_id_liked INTEGER NOT NULL,
+  user_id_liker INTEGER NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id_liked, user_id_liker)
+);`
+
 pool.query(createUserTableQuery, (err, res) => {
   if (err) {
     console.error(err);
@@ -69,6 +77,13 @@ pool.query(picQuery, (err, res) => {
     console.error(err);
   } else {
     console.log("Relation table created successfully");
+  }
+});
+pool.query(user_likes, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("user_likes table created successfully");
   }
 });
 
