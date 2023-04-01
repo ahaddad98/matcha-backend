@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   ContainerStyle,
-  LeftSideStyle,
+  FormConrainerStyle,
   FromsStyle,
   CopyrightStyle,
 } from "./LoginRegister.style";
@@ -16,13 +16,13 @@ const Home = () => {
   // const { loading, error } = useSelector((state) => state.user);
   return (
     <ContainerStyle>
-      <LeftSideStyle>
+      <FormConrainerStyle>
         <Logo className="logo" />
         <FromsStyle>
           {log ? <Login setLog={setLog} /> : <Register setLog={setLog} />}
         </FromsStyle>
         <CopyrightStyle>© 2021 Matcha All Rights Reserved</CopyrightStyle>
-      </LeftSideStyle>
+      </FormConrainerStyle>
       <RightSide />
     </ContainerStyle>
   );
