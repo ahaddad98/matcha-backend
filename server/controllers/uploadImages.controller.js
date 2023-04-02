@@ -79,13 +79,6 @@ const patchImages = (req, res) => {
     let promises = [];
     if (profilePicturePath) {
       promises.push(patchProfilePicsById(id, [id, profilePicturePath]))
-      // .then((user) => {
-      //   delete user.password;
-      //   res.status(200).json(user);
-      // })
-      // .catch((e) => {
-      //   res.status(400).json({ error: "Error searching user" });
-      // });
     }
     if (picturePaths.length) {
       for (let index = 0; index < picturePaths.length; index++) {

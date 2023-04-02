@@ -11,11 +11,10 @@ const {
   upload,
 } = require("../controllers/uploadImages.controller");
 const { searchUser } = require("../controllers/searchUser.controller");
-const { postLikes } = require("../controllers/userLikes.controller");
+const { postLikes, getLikeds, getLikers } = require("../controllers/userLikes.controller");
 const JWT_SECRET = process.env.JWT_SECRET;
 function verifyToken(req, res, next) {
   const token = req.headers.authorization;
-  console.log(token);
   if (!token) {
     return res.status(401).send("Unauthorized request");
   }
@@ -30,7 +29,9 @@ function verifyToken(req, res, next) {
 }
 router.get("/", verifyToken, getUsers);
 router.get("/search", verifyToken, searchUser);
-router.post("/likes/:id", postLikes);
+router.post("/likes",verifyToken,  postLikes);
+router.get("/mylikers",verifyToken,  getLikers);
+router.get("/mylikeds",verifyToken,  getLikeds);
 router.get("/:id", getUsersById);
 router.patch("/:id", patchUser);
 router.patch(

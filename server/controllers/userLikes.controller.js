@@ -3,26 +3,48 @@ const { getUsersByIdData } = require("./user.contoller");
 
 
 const addLikersQuery = `
-    INSERT INTO user_likes (user_id_liked, user_id_liker) VALUES (123, 456);
+    INSERT INTO user_likes (user_id_liked, user_id_liker) VALUES ($2,$1);
 `
 const getLikedQuery = `
-    INSERT INTO user_likes (user_id_liked, user_id_liker) VALUES (123, 456);
+    SELECT user_id_liker FROM user_likes WHERE user_id_liked = $1;
 `
 const getLikersQeury = `
-    SELECT user_id_liked FROM user_likes WHERE user_id_liker = Y;
+    SELECT user_id_liked FROM user_likes WHERE user_id_liker = $1;
 `
 
 
-function getLikes(id, values) {
+function addLikes(values) {
   return new Promise((resolve, reject) => {
-    pool.query(updateQuery, values, (err, res) => {
+    pool.query(addLikersQuery, values, (err, res) => {
       if (err) {
         reject(err);
       }
       if (res) {
-        getUsersByIdData(id)
-          .then((user) => resolve(user))
-          .catch((e) => console.log(e));
+        resolve(res)
+      }
+    });
+  });
+}
+function getmyLikers(values) {
+  return new Promise((resolve, reject) => {
+    pool.query(getLikersQeury, values, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      if (res) {
+        resolve(res.rows)
+      }
+    });
+  });
+}
+function getmyLikeds(values) {
+  return new Promise((resolve, reject) => {
+    pool.query(getLikedQuery, values, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      if (res) {
+        resolve(res.rows)
       }
     });
   });
@@ -30,10 +52,37 @@ function getLikes(id, values) {
 
 
 const postLikes = (req, res) => {
-  const { id } = req.params;
-  
+  const { user_id_liker, user_id_liked } = req.body;
+  addLikes([user_id_liker, user_id_liked]).then(user => {
+    res.status(200).json(user);
+  })
+  .catch ((e) => {
+    res.status(400).json(e.detail)
+  })
+};
+const getLikers = (req, res) => {
+  // const { user_id_liker, user_id_liked } = req.body;
+  console.log(req.user_id);
+  getmyLikers([req.user_id]).then(user => {
+    res.status(200).json(user);
+  })
+  .catch ((e) => {
+    res.status(400).json(e.detail)
+  })
+};
+const getLikeds = (req, res) => {
+  // const { user_id_liker, user_id_liked } = req.body;
+  getmyLikeds([req.user_id]).then(user => {
+    res.status(200).json(user);
+  })
+  .catch ((e) => {
+    res.status(400).json(e.detail)
+  })
 };
 
+
 module.exports = {
-    postLikes
+    postLikes,
+    getLikeds,
+    getLikers
 };
