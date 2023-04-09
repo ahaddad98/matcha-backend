@@ -57,6 +57,16 @@ const user_likes = `
   PRIMARY KEY (user_id_liked, user_id_liker)
 );`
 
+const user_Matches = `
+  CREATE TABLE IF NOT EXISTS user_matches (
+   id SERIAL PRIMARY KEY,
+   user_id INTEGER NOT NULL,
+   matched_user_id INTEGER NOT NULL,
+   created_at TIMESTAMP DEFAULT NOW(),
+   FOREIGN KEY (user_id) REFERENCES "user"(id),
+   FOREIGN KEY (matched_user_id) REFERENCES "user"(id)
+);`
+
 pool.query(createUserTableQuery, (err, res) => {
   if (err) {
     console.error(err);
@@ -84,6 +94,13 @@ pool.query(user_likes, (err, res) => {
     console.error(err);
   } else {
     console.log("user_likes table created successfully");
+  }
+});
+pool.query(user_Matches, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("user_matches table created successfully");
   }
 });
 
