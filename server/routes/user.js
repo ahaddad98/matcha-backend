@@ -24,7 +24,7 @@ function verifyToken(req, res, next) {
     next();
   } catch (err) {
     console.log(err);
-    res.status(400).send("heheh");
+    return res.status(401).send("Unauthorized request");
   }
 }
 router.get("/", verifyToken, getUsers);
@@ -33,8 +33,8 @@ router.post("/likes",verifyToken,  postLikes);
 router.get("/mymatchs",verifyToken,  getMyMachts);
 router.get("/mylikers",verifyToken,  getLikers);
 router.get("/mylikeds",verifyToken,  getLikeds);
-router.get("/:id", getUsersById);
-router.patch("/:id", patchUser);
+router.get("/:id",verifyToken, getUsersById);
+router.patch("/:id",verifyToken, patchUser);
 router.patch(
   "/pictures/:id",
   upload,

@@ -125,12 +125,16 @@ const postLikes = (req, res) => {
     }
     else {
       addLikes([user_id_liker, user_id_liked]).then(user => {
-        // user = user;
       })
         .catch((e) => {
           res.status(400).json(e.detail)
         })
       addMatches([user_id_liker, user_id_liked]).then((user) => {
+        res.status(200).json({user, ismatch: true});
+      }).catch((e) => {
+          res.status(400).json(e.detail)
+      })
+      addMatches([user_id_liked, user_id_liker]).then((user) => {
         res.status(200).json({user, ismatch: true});
       }).catch((e) => {
           res.status(400).json(e.detail)
