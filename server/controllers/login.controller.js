@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const expressJwt = require("express-jwt");
 const JWT_SECRET = process.env.JWT_SECRET;
+
 const searchUserQuery = `
 SELECT * 
 FROM "user" 
@@ -23,14 +24,11 @@ const verifyToken = expressJwt.expressjwt({
   algorithms: ["HS256"],
 });
 function searchUser(values) {
-  console.log(values);
   return new Promise((resolve, reject) => {
     pool.query(searchUserQuery, values, (err, res) => {
       if (err || res.rows.length === 0) {
-        console.log(`User not found`);
         reject(err);
       } else {
-        console.log(`User fouuuuund`);
         resolve(res.rows[0]);
       }
     });
@@ -54,12 +52,12 @@ const loginView = (req, res) => {
           //   const token = generateToken(user);
           res.status(200).json({ user, accessToken, refreshToken });
         } else {
+          res.status(404).json({ error: "Password or username not Correct" });
         }
       });
     })
     .catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: "Error searching user" });
+      res.status(404).json({ error: "User Not Found" });
     });
 };
 module.exports = {
