@@ -75,74 +75,74 @@ const completeProfile = (state) => {
 
 const Steper = () => {
     const [activeStep, setActiveStep] = useState(0);
-    let navigate = useNavigate();
+    // let navigate = useNavigate();
     const steps = getSteps();
-    const state = useSelector((state) => state);
-    const completeProfile = state.completeProfile;
-    const token = state?.userLogin?.user.token;
-    const handleNext = () => {
-        if (activeStep === 1 && validateSecondStep(completeProfile)) {
-            setActiveStep(activeStep + 1);
-        } else if (activeStep === 0 && validateFirstStep(completeProfile))
-            setActiveStep(activeStep + 1);
-        else if (activeStep === 2) {
-            axios
-                .post(
-                    "http://localhost:3000/api/user/complete",
-                    {
-                        locationLat: completeProfile.location.lat,
-                        locationLng: completeProfile.location.lng,
-                        sexualPreference: completeProfile.sexualPreferences,
-                        gender: completeProfile.gender,
-                        biography: completeProfile.biography,
-                        birthdate: "11/05/2000",
-                        listOfInterests: ["sport"],
-                        rating: 3,
-                        gallery: completeProfile.gallery,
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                )
-                .then((res) => {
-                    if (
-                        res.data.Status == "Success" ||
-                        res.data.Msg == "Profile already completed"
-                    ) {
-                        let user = localStorage.getItem("user");
-                        localStorage.setItem(
-                            "user",
-                            JSON.stringify({ ...user, complete: 1 })
-                        );
-                        navigate("/profile");
-                    }
-                    if (res.data.Status == "Failed")
-                        notification.open({
-                            message: "Notification Title",
-                            description: "Error",
-                            icon: (
-                                <SmileOutlined style={{ color: "#108ee9" }} />
-                            ),
-                        });
-                    console.log(res.data.msg[0][0]);
-                    console.log(res);
-                })
-                .catch((err) => console.log(err.response));
-            console.log({
-                locationLat: completeProfile.location.lat,
-                locationLng: completeProfile.location.lng,
-                sexualPreferences: completeProfile.sexualPreferences,
-                gender: completeProfile.gender,
-                biography: completeProfile.biography,
-                birthdate: completeProfile.birthdate,
-                listOfInterests: ["sport"],
-                rating: 3,
-                gallery: completeProfile.gallery,
-            });
-        }
-    };
+    // const state = useSelector((state) => state);
+    // const completeProfile = state.completeProfile;
+    // const token = state?.userLogin?.user.token;
+    // const handleNext = () => {
+    //     if (activeStep === 1 && validateSecondStep(completeProfile)) {
+    //         setActiveStep(activeStep + 1);
+    //     } else if (activeStep === 0 && validateFirstStep(completeProfile))
+    //         setActiveStep(activeStep + 1);
+    //     else if (activeStep === 2) {
+    //         axios
+    //             .post(
+    //                 "http://localhost:3000/api/user/complete",
+    //                 {
+    //                     locationLat: completeProfile.location.lat,
+    //                     locationLng: completeProfile.location.lng,
+    //                     sexualPreference: completeProfile.sexualPreferences,
+    //                     gender: completeProfile.gender,
+    //                     biography: completeProfile.biography,
+    //                     birthdate: "11/05/2000",
+    //                     listOfInterests: ["sport"],
+    //                     rating: 3,
+    //                     gallery: completeProfile.gallery,
+    //                 },
+    //                 {
+    //                     headers: {
+    //                         Authorization: `Bearer ${token}`,
+    //                     },
+    //                 }
+    //             )
+    //             .then((res) => {
+    //                 if (
+    //                     res.data.Status == "Success" ||
+    //                     res.data.Msg == "Profile already completed"
+    //                 ) {
+    //                     let user = localStorage.getItem("user");
+    //                     localStorage.setItem(
+    //                         "user",
+    //                         JSON.stringify({ ...user, complete: 1 })
+    //                     );
+    //                     navigate("/profile");
+    //                 }
+    //                 if (res.data.Status == "Failed")
+    //                     notification.open({
+    //                         message: "Notification Title",
+    //                         description: "Error",
+    //                         icon: (
+    //                             <SmileOutlined style={{ color: "#108ee9" }} />
+    //                         ),
+    //                     });
+    //                 console.log(res.data.msg[0][0]);
+    //                 console.log(res);
+    //             })
+    //             .catch((err) => console.log(err.response));
+    //         console.log({
+    //             locationLat: completeProfile.location.lat,
+    //             locationLng: completeProfile.location.lng,
+    //             sexualPreferences: completeProfile.sexualPreferences,
+    //             gender: completeProfile.gender,
+    //             biography: completeProfile.biography,
+    //             birthdate: completeProfile.birthdate,
+    //             listOfInterests: ["sport"],
+    //             rating: 3,
+    //             gallery: completeProfile.gallery,
+    //         });
+    //     }
+    // };
 
     const handleBack = () => {
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -169,13 +169,13 @@ const Steper = () => {
             </Stepper>
             <div className="steper--step">
                 <div className="steper--step__content">
-                    {getStepContent(activeStep)}
+                    {/* {getStepContent(activeStep)} */}
                 </div>
                 <div className="steper--step__buttons">
                     <Button
                         className="steper--step__button steper--step__button--back"
                         disabled={activeStep === 0}
-                        onClick={handleBack}
+                        // onClick={handleBack}
                     >
                         Back
                     </Button>
@@ -183,7 +183,7 @@ const Steper = () => {
                         className="steper--step__button steper--step__button--next"
                         variant="contained"
                         color="primary"
-                        onClick={handleNext}
+                        // onClick={handleNext}
                     >
                         {activeStep === steps.length - 1 ? "Finish" : "Next"}
                     </Button>

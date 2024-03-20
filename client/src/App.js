@@ -5,6 +5,12 @@ import "./index.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./views/Home/LoginRegister";
 import GlobalStyle from "./globalStyles";
+import { ProtectedRoutes } from "./components/routing";
+import CompleteProfile from "./views/CompleteProfile";
+// import { Chat } from "@material-ui/icons";
+import Profile from "./views/Profile/Profile";
+import Browsing from "./views/Browsing/Browsing";
+import Chat from "./views/Chat/Chat";
 
 const App = () => {
     const [themeSelector, setThemeSelector] = useState(true);
@@ -16,7 +22,7 @@ const App = () => {
                     <Route index path="/" element={<Home />} />
                     {/* <Route path="/verifyProfil" element={<ComfirmAccount />} /> */}
                     {/* protected routes */}
-                    {/* <Route element={<ProtectedRoutes />}>
+                    {/* <Route element={<ProtectedRoutes />}> */}
                         <Route
                             path="/completeProfile"
                             element={<CompleteProfile />}
@@ -24,7 +30,7 @@ const App = () => {
                         <Route path="/messages" element={<Chat />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/browsing" element={<Browsing />} />
-                    </Route> */}
+                    {/* </Route> */}
                 </Routes>
             </BrowserRouter>
         </ThemeProvider>

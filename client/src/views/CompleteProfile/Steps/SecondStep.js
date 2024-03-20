@@ -1,7 +1,7 @@
 import { StyledSecondStep } from "./SecondStepStyle";
 import { AiFillPlusCircle } from "react-icons/ai";
 import { useEffect, useState } from "react";
-import { CompleteProfileActionTypes } from "../../../store/actions/actionTypes";
+// import { CompleteProfileActionTypes } from "../../../store/actions/actionTypes";
 import { useSelector, useDispatch } from "react-redux";
 const SecondStep = () => {
     const state = useSelector((state) => state.completeProfile);
@@ -18,12 +18,12 @@ const SecondStep = () => {
             if (e.currentTarget.result.match("data:image.*")) {
                 console.log(e.currentTarget.result);
                 dispatch({
-                    type: CompleteProfileActionTypes.gallery,
+                    // type: CompleteProfileActionTypes.gallery,
                     gallery: [...gallery, e.currentTarget.result],
                 });
                 if (gallery.length == 0) {
                     dispatch({
-                        type: CompleteProfileActionTypes.profilePicture,
+                        // type: CompleteProfileActionTypes.profilePicture,
                         profilePicture: e.currentTarget.result,
                     });
                 }
@@ -69,11 +69,11 @@ const SecondStep = () => {
                                             gallery[0] = gallery[index];
                                             gallery[index] = tmp;
                                             dispatch({
-                                                type: CompleteProfileActionTypes.gallery,
+                                                // type: CompleteProfileActionTypes.gallery,
                                                 gallery: [...gallery],
                                             });
                                             dispatch({
-                                                type: CompleteProfileActionTypes.profilePicture,
+                                                // type: CompleteProfileActionTypes.profilePicture,
                                                 profilePicture: gallery[0],
                                             });
                                         }}
@@ -87,18 +87,18 @@ const SecondStep = () => {
                                         gallery.splice(index, 1);
                                         if (profilePicture === url) {
                                             dispatch({
-                                                type: CompleteProfileActionTypes.profilePicture,
+                                                // type: CompleteProfileActionTypes.profilePicture,
                                                 profilePicture: "",
                                             });
                                             if (gallery.length > 0) {
                                                 dispatch({
-                                                    type: CompleteProfileActionTypes.profilePicture,
+                                                    // type: CompleteProfileActionTypes.profilePicture,
                                                     profilePicture: gallery[0],
                                                 });
                                             }
                                         }
                                         dispatch({
-                                            type: CompleteProfileActionTypes.gallery,
+                                            // type: CompleteProfileActionTypes.gallery,
                                             gallery: [...gallery],
                                         });
                                     }}

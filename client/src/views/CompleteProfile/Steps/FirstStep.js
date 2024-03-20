@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { DatePicker } from "antd";
 import moment from "moment";
 import { Input } from "antd";
-import { CompleteProfileActionTypes } from "../../../store/actions/actionTypes";
+// import { CompleteProfileActionTypes  } from "../../../store/actions/actionTypes";
+// import { Compl/eteProfileActionTypes  } from "../../../store/actions/actionTypes";
 import Chip from "@mui/material/Chip";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -56,11 +57,11 @@ const FirstStep = () => {
     };
     const onSelect = (data) => {
         dispatch({
-            type: CompleteProfileActionTypes.listOfInterests,
+            // type: CompleteProfileActionTypes.listOfInterests,
             listOfInterests: [...listOfInterests, data],
         });
         console.log("onSelect", data);
-    };
+    }; 
     const onChange = (data) => {
         setValue(data);
     };
@@ -75,7 +76,7 @@ const FirstStep = () => {
                             // onChange={onChange}
                             onChange={(e) => {
                                 dispatch({
-                                    type: CompleteProfileActionTypes.gender,
+                                    // type: CompleteProfileActionTypes.gender,
                                     gender: e.target.value,
                                 });
                             }}
@@ -93,7 +94,7 @@ const FirstStep = () => {
                             format={dateFormat}
                             onChange={(data, dateString) => {
                                 dispatch({
-                                    type: CompleteProfileActionTypes.birthdate,
+                                    // type: CompleteProfileActionTypes.birthdate,
                                     birthdate: dateString,
                                 });
                             }}
@@ -106,7 +107,7 @@ const FirstStep = () => {
                 <Radio.Group
                     onChange={(e) => {
                         dispatch({
-                            type: CompleteProfileActionTypes.sexualPreferences,
+                            // type: CompleteProfileActionTypes.sexualPreferences,
                             sexualPreferences: e.target.value,
                         });
                     }}
@@ -150,7 +151,7 @@ const FirstStep = () => {
                         maxLength={150}
                         onChange={(e) => {
                             dispatch({
-                                type: CompleteProfileActionTypes.biography,
+                                // type: CompleteProfileActionTypes.biography,
                                 biography: e.target.value,
                             });
                         }}

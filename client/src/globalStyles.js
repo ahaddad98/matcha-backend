@@ -11,8 +11,8 @@ const GlobalStyle = createGlobalStyle`
   body {
     font-family: 'DidactGothic', sans-serif;
     font-size: calc(0.75em + 1vmin);
-    width: 100%;
-    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
     background-color: ${(props) => props.theme.background.primary};
   }
   input[type='submit'] {

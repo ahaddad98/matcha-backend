@@ -3,7 +3,7 @@ import { ThirdStepStyle } from "./ThirdStep.Style";
 import CircularProgress from "@mui/material/CircularProgress";
 import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
 import { useDispatch, useSelector } from "react-redux";
-import { CompleteProfileActionTypes } from "../../../store/actions/actionTypes";
+// import { CompleteProfileActionTypes } from "../../../store/actions/actionTypes";
 function LocationMarker() {
     const dispatch = useDispatch();
     const [position, setPosition] = useState(null);
@@ -13,7 +13,7 @@ function LocationMarker() {
             console.log(e.latlng);
             setPosition(e.latlng);
             dispatch({
-                type: CompleteProfileActionTypes.location,
+                // type: CompleteProfileActionTypes.location,
                 location: { lat: e.latlng.lat, lng: e.latlng.lng },
             });
         },
@@ -35,7 +35,7 @@ const ThirdStep = () => {
                     position.coords.longitude,
                 ]);
                 dispatch({
-                    type: CompleteProfileActionTypes.location,
+                    // type: CompleteProfileActionTypes.location,
                     location: {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude,

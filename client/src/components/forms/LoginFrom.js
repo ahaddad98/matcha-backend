@@ -13,25 +13,28 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Await, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import ForgotPassword from "../../views/Home/ForgotPassword";
 
-import { Rings } from "react-loader-spinner";
 import { userLogin } from "../../store/slices/authActions";
+import { useLayoutEffect } from "react";
 const Login = (props) => {
   let navigate = useNavigate();
   const MySwal = withReactContent(Swal);
   const dispatch = useDispatch();
-  const loginForm = () => {
-    console.log(values);
-    dispatch(
-      userLogin({ usename: values.username, password: values.password })
-    );
-    // if (!loading) {
-    //     dispatch(userLoginAction(values.username, values.password));
-    // }
+  const loginForm = async  () => {
+    const data = await dispatch(userLogin({ username: values.username, password: values.password }));
+    console.log(data.payload.isLog);
+    if (data.payload.isLog === true)
+    {
+      navigate('/browsing')
+    }
+    else
+    {
+      alert('User Not Found')
+    }
   };
 
   const { handleChange, values, errors, handleSubmit } = useForm(loginForm);
@@ -39,8 +42,6 @@ const Login = (props) => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  //   const userLogin = useSelector((state) => state.userLogin);
-  //   const { loading, error, user } = userLogin;
   const Variant = {
     hidden: {
       x: 500,
@@ -52,26 +53,11 @@ const Login = (props) => {
       transition: { duration: 1, easing: "easeInOut" },
     },
   };
+  useLayoutEffect(() => {
+    if (localStorage.getItem('Token'))
+      navigate('/')
+  },[])
 
-  //   useEffect(() => {
-  //     if (user) {
-  //       if (user?.complete === 0) navigate("/completeProfile");
-  //       else if (user?.complete) navigate("/profile");
-  //     }
-  //     console.log(user?.complete);
-  //   }, [userLogin]);
-  //   useEffect(() => {
-  //     if (error) {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Oops...",
-  //         text: error.ErrorMessage,
-  //       }).then(() => {
-  //         // setLog(true);
-  //         dispatch({ type: "USER_LOGIN_CLEAR" });
-  //       });
-  //     }
-  //   }, [error]);
   return (
     <LoginFormStyle animate="show" initial="hidden" variants={Variant}>
       <h1>
@@ -84,8 +70,8 @@ const Login = (props) => {
           variant="outlined"
           name="username"
           onChange={handleChange}
-          //   error={error ? true : false}
-          // helperText="Incorrect entry."
+        //   error={error ? true : false}
+        // helperText="Incorrect entry."
         />
         <TextFieldStyled
           //   error={error ? true : false}

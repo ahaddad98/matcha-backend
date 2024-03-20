@@ -9,9 +9,9 @@ export const ContainerStyle = styled.div`
   max-width: 1800px;
   /* height: 1000px; */
   height: 80%;
-  min-height: 800px;
+  /* min-height: 800px; */
   max-height: 1000px;
-  padding-top: 40px;
+  /* padding-top: 40px; */
   margin: 0 auto;
   display: flex;
   flex-flow: row wrap;
@@ -24,8 +24,8 @@ export const ContainerStyle = styled.div`
 
 export const FormConrainerStyle = styled.div`
   flex: 1 1 50%;
-  max-height: 1200px;
-  min-height: 1000px;
+  /* max-height: 1200px;
+  min-height: 1000px; */
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;

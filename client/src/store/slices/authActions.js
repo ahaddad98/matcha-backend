@@ -12,20 +12,18 @@ export const userLogin = createAsyncThunk(
           "Content-Type": "application/json",
         },
       };
-
+      console.log( { username, password });
       const { data } = await axios.post(
         `${backendURL}/login`,
         { username, password },
         config
       );
-      localStorage.setItem("userToken", data.accessToken);
-      return data;
+      console.log('data', data);
+      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+      return {isLog: true, data};
     } catch (error) {
-      if (error.response && error.response.data.message) {
-        return rejectWithValue(error.response.data.message);
-      } else {
-        return rejectWithValue(error.message);
-      }
+      return {islog: false}
     }
   }
 );

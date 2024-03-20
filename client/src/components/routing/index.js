@@ -12,7 +12,7 @@ import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 
-const ProtectedRoutes = () => {
+export  const ProtectedRoutes = () => {
     let location = useLocation();
     const { user } = useSelector((state) => state.userLogin);
     if (!user || !user?.verified)
