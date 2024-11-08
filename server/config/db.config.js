@@ -31,7 +31,9 @@ CREATE TABLE IF NOT EXISTS "user" (
     pictures VARCHAR(255)[4],
     latitude VARCHAR(255),
     longitude VARCHAR(255),
-    birthday DATE
+    birthday DATE,
+    token TEXT,
+    refresh_token TEXT
 );
 `;
 
