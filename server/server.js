@@ -1,22 +1,26 @@
-require("dotenv").config();
-const express = require("express");
+import dotenv from "dotenv";
+import express from "express";
+import GlobalRouter from "./routes/global.router";
+import cors from "cors";
+
+dotenv.config();
+
 const app = express();
-const pool = require("./config/db.config");
-const cors = require("cors");
-//engine to use embeded js
+
 app.use(express.static("upload"));
 app.use(express.json());
-// app.set('view engine', 'ejs');
+
 app.use(
   cors({
     origin: "http://localhost:3000",
   })
 );
-app.use("/", require("./routes/login"));
-app.use("/users", require("./routes/user"));
-app.use(require("./routes/error"));
+
+app.use("/api", GlobalRouter());
+
 const PORT = process.env.NODE_DOCKER_PORT || 4000;
 app.listen(PORT, console.log("Server don start for port: " + PORT));
+
 /*
 SELECT *
 FROM users
