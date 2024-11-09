@@ -1,4 +1,4 @@
-const { Client } = require("pg");
+import pg from 'pg';
 
 const dbConfig = {
   user: process.env.DB_USER,
@@ -7,7 +7,7 @@ const dbConfig = {
   port: process.env.DB_PORT,
   database: process.env.DB_NAME,
 };
-const pool = new Client(dbConfig);
+const pool = new pg.Client(dbConfig);
 pool
   .connect()
   .then(() => { })
@@ -106,6 +106,5 @@ pool.query(user_Matches, (err, res) => {
   }
 });
 
-module.exports = pool;
+export default pool;
 
-//   module.exports = pool

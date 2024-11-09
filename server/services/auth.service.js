@@ -1,7 +1,7 @@
-import pool from "../config/db.config";
+import pool from "../config/db.config.js";
 import bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import Exception from "../errors/Exception";
+import Exception from "../errors/Exception.js";
 
 class AuthService {
   static async login(args) {

@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
-import GlobalRouter from "./routes/global.router";
+import GlobalRouter from "./routes/global.router.js";
 import cors from "cors";
 
 dotenv.config();

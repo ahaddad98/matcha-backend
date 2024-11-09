@@ -1,5 +1,5 @@
-import logger from "../../log/logger";
-import AuthService from "../../services/auth.service";
+import logger from "../../log/logger.js";
+import AuthService from "../../services/auth.service.js";
 
 const LoginController = async (req, res, next) => {
   try {
