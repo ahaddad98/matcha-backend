@@ -1,19 +1,37 @@
-import pg from 'pg';
+import pg from "pg";
 
 const dbConfig = {
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
+  user: "postgres",
+  host: "localhost",
+  password: "postgres",
+  port: 5427,
+  database: "matcha",
 };
 const pool = new pg.Client(dbConfig);
 pool
   .connect()
-  .then(() => { })
+  .then(() => {})
   .catch((error) => {
     console.log(error);
   });
+
+const CreateGenderTypeQuery = `
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname='gendertype') THEN
+    CREATE TYPE GenderType AS ENUM('MALE', 'FEMALE');
+  END IF;
+END$$;
+`;
+
+const CreateTagsQuery = `
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tag') THEN
+    CREATE TYPE TAG AS ENUM('vegan', 'geek', 'piercing');
+  END IF;
+END$$;
+`;
 
 const createUserTableQuery = `
 CREATE TABLE IF NOT EXISTS "user" (
@@ -23,52 +41,74 @@ CREATE TABLE IF NOT EXISTS "user" (
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    gender VARCHAR(10) CHECK (gender IN ('male', 'female', 'other')),
-    sexual_preferences VARCHAR(50),
+    verified BOOLEAN DEFAULT false,
+    enabled BOOLEAN DEFAULT true,
+    verification_key TEXT,
+    verification_end_date TIMESTAMPTZ,
+    reset_key TEXT,
+    reset_end_date TIMESTAMPTZ,
+    gender GenderType,
     biography TEXT,
-    interests TEXT[],
-    profile_picture VARCHAR(255),
-    pictures VARCHAR(255)[4],
+    default_cover TEXT,
     latitude VARCHAR(255),
     longitude VARCHAR(255),
     birthday DATE,
     token TEXT,
-    refresh_token TEXT
+    refresh_token TEXT,
+    tags TAG[]
 );
 `;
 
-const CretaePictureQuery = `CREATE TABLE IF NOT EXISTS pictures (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES "user" (id),
-  url VARCHAR(255)
-);`
-
-const picQuery = `
-  SELECT u.id, u.username, COUNT(p.id) as picture_count
-  FROM "user" u
-  LEFT JOIN pictures p ON u.id = p.user_id
-  GROUP BY u.id
-  HAVING COUNT(p.id) < 4;
+const CreateSexualPreferences = ` CREATE TABLE IF NOT EXISTS SexualPreference (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES "user" (id),
+      preference GenderType NOT NULL
+);
 `;
 
-const user_likes = `
-  CREATE TABLE IF NOT EXISTS user_likes (
-  user_id_liked INTEGER NOT NULL,
-  user_id_liker INTEGER NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (user_id_liked, user_id_liker)
-);`
+const CreateProfileQuery = `CREATE TABLE IF NOT EXISTS profile (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES "user" (id),
+  cover   VARCHAR(255)
+);`;
 
-const user_Matches = `
-  CREATE TABLE IF NOT EXISTS user_matches (
-   id SERIAL PRIMARY KEY,
-   user_id INTEGER NOT NULL,
-   matched_user_id INTEGER NOT NULL,
-   created_at TIMESTAMP DEFAULT NOW(),
-   FOREIGN KEY (user_id) REFERENCES "user"(id),
-   FOREIGN KEY (matched_user_id) REFERENCES "user"(id)
-);`
+// const user_likes = `
+//   CREATE TABLE IF NOT EXISTS user_likes (
+//   user_id_liked INTEGER NOT NULL,
+//   user_id_liker INTEGER NOT NULL,
+//   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+//   PRIMARY KEY (user_id_liked, user_id_liker)
+// );`;
 
+// const user_Matches = `
+//   CREATE TABLE IF NOT EXISTS user_matches (
+//    id SERIAL PRIMARY KEY,
+//    user_id INTEGER NOT NULL,
+//    matched_user_id INTEGER NOT NULL,
+//    created_at TIMESTAMP DEFAULT NOW(),
+//    FOREIGN KEY (user_id) REFERENCES "user"(id),
+//    FOREIGN KEY (matched_user_id) REFERENCES "user"(id)
+// );`;
+
+// GENDER_TYPE
+pool.query(CreateGenderTypeQuery, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("Geneder type enum created successfully");
+  }
+});
+
+// TAGS
+pool.query(CreateTagsQuery, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("Tag enum type created successfully");
+  }
+});
+
+// USER
 pool.query(createUserTableQuery, (err, res) => {
   if (err) {
     console.error(err);
@@ -77,34 +117,22 @@ pool.query(createUserTableQuery, (err, res) => {
   }
 });
 
-pool.query(CretaePictureQuery, (err, res) => {
+// PROFILE_PICTURES
+pool.query(CreateProfileQuery, (err, res) => {
   if (err) {
     console.error(err);
   } else {
     console.log("pitures table created successfully");
   }
 });
-pool.query(picQuery, (err, res) => {
+
+// SEXUAL_PREFERENCES
+pool.query(CreateSexualPreferences, (err, res) => {
   if (err) {
     console.error(err);
   } else {
-    console.log("Relation table created successfully");
-  }
-});
-pool.query(user_likes, (err, res) => {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log("user_likes table created successfully");
-  }
-});
-pool.query(user_Matches, (err, res) => {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log("user_matches table created successfully");
+    console.log("Sexual Preference type created successfully");
   }
 });
 
 export default pool;
-

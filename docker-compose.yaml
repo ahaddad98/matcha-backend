@@ -1,29 +1,33 @@
-version: "3.3"
+version: "3.7"
 
 services:
   postgres:
-    image: postgres:13.3
-    env_file: ./.env
+    image: postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=matcha
     ports:
-      - $POSTGRES_LOCAL_PORT:$POSTGRES_DOCKER_PORT
+      - 5427:5432
     volumes:
-      - dbtet:/var/lib/postgresql/data
-  app:
-    depends_on:
-      - postgres
-    build: ./server
-    env_file: ./.env
-    ports:
-      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-    environment:
-      - DB_HOST=postgres
-      - DB_USER=$POSTGRES_USER
-      - DB_PASSWORD=$POSTGRES_PASSWORD
-      - DB_NAME=$POSTGRES_DATABASE
-      - DB_PORT=$POSTGRES_DOCKER_PORT
+      - db:/pgdata
+  # app:
+  #   depends_on:
+  #     - postgres
+  #   build: ./server
+  #   env_file: ./.env
+  #   ports:
+  #     - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+  #   environment:
+  #     - DB_HOST=postgres
+  #     - DB_USER=$POSTGRES_USER
+  #     - DB_PASSWORD=$POSTGRES_PASSWORD
+  #     - DB_NAME=$POSTGRES_DATABASE
+  #     - DB_PORT=$POSTGRES_DOCKER_PORT
 volumes:
-  dbtet:
+  db:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: $HOME/matcha_data
