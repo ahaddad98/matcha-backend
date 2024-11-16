@@ -1,22 +1,26 @@
+import status from "http-status";
 import pool from "../config/db.config.js";
 import bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import Exception from "../errors/Exception.js";
 import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
+import logger from "../log/logger.js";
+import HttpStatus from "../enums/HttpStatus.enum.js";
 
 class AuthService {
   static async login(args) {
     const querySearch = `SELECT * FROM "user" WHERE username = $1 and verified = true`;
     const user = await pool.query(querySearch, [args.username]);
-    if (user) {
-      const isMatched = bcrypt.compareSync(args.password, user.password);
+    if (user.rowCount > 0) {
+      const password = user.rows[0].password;
+      const isMatched = bcrypt.compareSync(args.password, password);
       if (isMatched) {
         const { token, refresh_token } = this.generate_token({
-          id: user.id,
-          email: user.email,
-          first_name: user.first_name,
-          last_name: user.last_name,
+          id: user.rows[0].id,
+          email: user.rows[0].email,
+          first_name: user.rows[0].first_name,
+          last_name: user.rows[0].last_name,
         });
         return {
           type: "Bearer",
@@ -26,14 +30,17 @@ class AuthService {
         };
       } else {
         throw new Exception(
-          "INVALID_CREDIENTIEL",
-          400,
-          "invalid credentiel",
-          "login"
+          status[status.CONFLICT],
+          status.CONFLICT,
+          "invalid credentials"
         );
       }
     } else {
-      throw new Error("INVALID_CREDIENTIEL");
+      throw new Exception(
+        status[status.CONFLICT],
+        status.CONFLICT,
+        "invalid credentials"
+      );
     }
   }
 
@@ -43,35 +50,34 @@ class AuthService {
 
   static generate_token(payload) {
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expireIn: "24h",
+      expiresIn: "24h",
     });
     const refresh_token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expireIn: "2w",
+      expiresIn: "2w",
     });
     return { token, refresh_token };
   }
 
   static async register(args) {
-    const transporter = nodemailer.createTransport("SMTP", {
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
-      },
-    });
-    const insertUser = `INSERT INTO user(first_name, last_name, username, email, password, latitude, longitude, verification_key, verification_end_date)
-    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    // const transporter = nodemailer.createTransport("SMTP", {
+    //   service: "gmail",
+    //   auth: {
+    //     user: process.env.GMAIL_USER,
+    //     pass: process.env.GMAIL_PASS,
+    //   },
+    // });
+    const insertUser = `INSERT INTO "user" (first_name, last_name, username, email, password, latitude, longitude, verification_key, verification_end_date)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING id, first_name, last_name, username, email;
     `;
     const { email, first_name, last_name, password, username, geoPoint } = args;
-    const querySearch = `SELECT * FROM "user" WHERE email = $1`;
-    const isExists = await pool.query(querySearch, [email]);
-    if (isExists) {
+    const querySearch = `SELECT * FROM "user" WHERE email = $1 or username = $2`;
+    const isExists = await pool.query(querySearch, [email, username]);
+    if (isExists.rowCount > 0) {
       throw new Exception(
-        "INVALID_CREDIENTIEL",
-        400,
-        "invalid credential",
-        "register"
+        status[status.CONFLICT],
+        status.CONFLICT,
+        "invalid credentials"
       );
     }
     const verification_key = this.generate_key();
@@ -89,41 +95,39 @@ class AuthService {
       verification_key,
       verification_end_date,
     ]);
-    const verifyUrl = `http://${req.get(
-      "host"
-    )}/api/auth/verify?token=${verification_key}`;
-    const mailOptions = {
-      from: process.env.GMAIL_USER,
-      to: email,
-      subject: "Account Verification",
-      text: `Please verify your account by clicking the following link: ${verifyUrl}`,
-    };
+    const verifyUrl = `http://localhost:4000/api/auth/verify?token=${verification_key}`;
+    logger.info("User created verify link", verifyUrl);
+    // const mailOptions = {
+    //   from: process.env.GMAIL_USER,
+    //   to: email,
+    //   subject: "Account Verification",
+    //   text: `Please verify your account by clicking the following link: ${verifyUrl}`,
+    // };
 
-    await transporter.sendMail(mailOptions);
+    // await transporter.sendMail(mailOptions);
     return user;
   }
 
   static async verify(token) {
     const querySearch = `SELECT * FROM "user" WHERE verification_key = $1;`;
     const verifyUser = `UPDATE user set verified = true, verification_key = null, verification_end_date = null WHERE id = $1`;
-    const user = await pool.query(querySearch, [token]);
-    if (user) {
+    const row = await pool.query(querySearch, [token]);
+    if (row.rowCount > 0) {
       const current_date = new Date();
+      const user = row.rows[0];
       if (user.verification_end_date > current_date) {
         throw new Exception(
-          "EXPIRED_TOKEN",
-          400,
-          "token has expired",
-          "verify"
+          HttpStatus.EXPIRED_TOKEN,
+          status.BAD_REQUEST,
+          "token has been expired"
         );
       }
       await pool.query(verifyUser, [user.id]);
     } else {
       throw new Exception(
-        "ACTIVATION_KEY_NOT_FOUND",
-        404,
-        "activation key not found",
-        "verify"
+        HttpStatus.ACTIVATION_KEY_NOT_FOUND,
+        status.NOT_FOUND,
+        "activation key not found"
       );
     }
   }

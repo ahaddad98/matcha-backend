@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS "user" (
     gender GenderType,
     biography TEXT,
     default_cover TEXT,
+    covers  TEXT[],
+    last_time_connected TIMESTAMPTZ,
     latitude VARCHAR(255),
     longitude VARCHAR(255),
     birthday DATE,
@@ -66,11 +68,11 @@ const CreateSexualPreferences = ` CREATE TABLE IF NOT EXISTS SexualPreference (
 );
 `;
 
-const CreateProfileQuery = `CREATE TABLE IF NOT EXISTS profile (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES "user" (id),
-  cover   VARCHAR(255)
-);`;
+// const CreateProfileQuery = `CREATE TABLE IF NOT EXISTS profile (
+//   id SERIAL PRIMARY KEY,
+//   user_id INTEGER REFERENCES "user" (id),
+//   cover   VARCHAR(255)
+// );`;
 
 // const user_likes = `
 //   CREATE TABLE IF NOT EXISTS user_likes (
@@ -114,15 +116,6 @@ pool.query(createUserTableQuery, (err, res) => {
     console.error(err);
   } else {
     console.log("User table created successfully");
-  }
-});
-
-// PROFILE_PICTURES
-pool.query(CreateProfileQuery, (err, res) => {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log("pitures table created successfully");
   }
 });
 

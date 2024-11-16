@@ -1,5 +1,5 @@
-import logger from "../../log/logger";
-import UserService from "../../services/user.service";
+import logger from "../../log/logger.js";
+import UserService from "../../services/user.service.js";
 
 const UpdateUserController = async (req, res, next) => {
   try {

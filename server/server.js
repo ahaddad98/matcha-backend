@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import GlobalRouter from "./routes/global.router.js";
 import cors from "cors";
+import ErrorMiddleware from "./middlewares/error.middleware.js";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(
 );
 
 app.use("/api", GlobalRouter());
+app.use(ErrorMiddleware);
 
 const PORT = process.env.NODE_DOCKER_PORT || 4000;
 app.listen(PORT, console.log("Server don start for port: " + PORT));

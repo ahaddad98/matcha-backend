@@ -9,8 +9,7 @@ const AuthRouter = () => {
   router.post("/login", LoginController);
   router.post("/register", RegisterController);
   router.get("/verify", VerifyController);
-  // router.get("/refresh-token", Refreshtoken);
-  // router.get("/reset-password", ResetPassword);
+  router.get("/refresh-token");
 
   return router;
 };
