@@ -50,7 +50,6 @@ CREATE TABLE IF NOT EXISTS "user" (
     gender GenderType,
     biography TEXT,
     default_cover TEXT,
-    covers  TEXT[],
     last_time_connected TIMESTAMPTZ,
     latitude VARCHAR(255),
     longitude VARCHAR(255),
@@ -68,11 +67,11 @@ const CreateSexualPreferences = ` CREATE TABLE IF NOT EXISTS SexualPreference (
 );
 `;
 
-// const CreateProfileQuery = `CREATE TABLE IF NOT EXISTS profile (
-//   id SERIAL PRIMARY KEY,
-//   user_id INTEGER REFERENCES "user" (id),
-//   cover   VARCHAR(255)
-// );`;
+const CreateProfileQuery = `CREATE TABLE IF NOT EXISTS profile (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES "user" (id),
+  cover   VARCHAR(255)
+);`;
 
 // const user_likes = `
 //   CREATE TABLE IF NOT EXISTS user_likes (
@@ -110,6 +109,15 @@ pool.query(CreateTagsQuery, (err, res) => {
   }
 });
 
+// PROFILE
+pool.query(CreateProfileQuery, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("Profile table created successfully");
+  }
+});
+
 // USER
 pool.query(createUserTableQuery, (err, res) => {
   if (err) {
@@ -125,6 +133,15 @@ pool.query(CreateSexualPreferences, (err, res) => {
     console.error(err);
   } else {
     console.log("Sexual Preference type created successfully");
+  }
+});
+
+// ALTER USER
+pool.query(`alter table "user" drop column if exists covers;`, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("Drop column covers from user table");
   }
 });
 

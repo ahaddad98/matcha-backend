@@ -3,10 +3,10 @@ import pool from "../config/db.config.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Exception from "../errors/Exception.js";
-import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
 import logger from "../log/logger.js";
 import HttpStatus from "../enums/HttpStatus.enum.js";
+import MailService from "./mail.service.js";
 
 class AuthService {
   static async login(args) {
@@ -59,18 +59,19 @@ class AuthService {
   }
 
   static async register(args) {
-    // const transporter = nodemailer.createTransport("SMTP", {
-    //   service: "gmail",
-    //   auth: {
-    //     user: process.env.GMAIL_USER,
-    //     pass: process.env.GMAIL_PASS,
-    //   },
-    // });
     const insertUser = `INSERT INTO "user" (first_name, last_name, username, email, password, latitude, longitude, verification_key, verification_end_date)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING id, first_name, last_name, username, email;
     `;
-    const { email, first_name, last_name, password, username, geoPoint } = args;
+    const {
+      email,
+      first_name,
+      last_name,
+      password,
+      username,
+      latitude,
+      longitude,
+    } = args;
     const querySearch = `SELECT * FROM "user" WHERE email = $1 or username = $2`;
     const isExists = await pool.query(querySearch, [email, username]);
     if (isExists.rowCount > 0) {
@@ -90,21 +91,18 @@ class AuthService {
       username,
       email,
       hashPass,
-      geoPoint.latitude,
-      geoPoint.longitude,
+      latitude,
+      longitude,
       verification_key,
       verification_end_date,
     ]);
     const verifyUrl = `http://localhost:4000/api/auth/verify?token=${verification_key}`;
     logger.info("User created verify link", verifyUrl);
-    // const mailOptions = {
-    //   from: process.env.GMAIL_USER,
-    //   to: email,
-    //   subject: "Account Verification",
-    //   text: `Please verify your account by clicking the following link: ${verifyUrl}`,
-    // };
-
-    // await transporter.sendMail(mailOptions);
+    await MailService.sendEmail({
+      toEmail: email,
+      subject: "Account Activation",
+      content: `Please verify your account by clicking the following link: ${verifyUrl}`,
+    });
     return user;
   }
 
@@ -115,7 +113,7 @@ class AuthService {
     if (row.rowCount > 0) {
       const current_date = new Date();
       const user = row.rows[0];
-      if (user.verification_end_date > current_date) {
+      if (user.verification_end_date < current_date) {
         throw new Exception(
           HttpStatus.EXPIRED_TOKEN,
           status.BAD_REQUEST,

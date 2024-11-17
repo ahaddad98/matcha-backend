@@ -5,7 +5,7 @@ import Validate from "../../validators/validate.js";
 
 const RegisterController = async (req, res, next) => {
   try {
-    const errors = Validate.validate_register_payload(req.body);
+    const errors = Validate.validate_fields(req.body);
     if (errors.length) {
       throw new Exception(
         status[status.BAD_REQUEST],
@@ -14,7 +14,7 @@ const RegisterController = async (req, res, next) => {
         errors
       );
     }
-    const { email, first_name, last_name, password, username, geoPoint } =
+    const { email, first_name, last_name, password, username, latitude, longitude } =
       req.body;
     const data = await AuthService.register({
       email,
@@ -22,7 +22,8 @@ const RegisterController = async (req, res, next) => {
       last_name,
       password,
       username,
-      geoPoint,
+      latitude,
+      longitude
     });
     return res.status(201).json(data);
   } catch (error) {

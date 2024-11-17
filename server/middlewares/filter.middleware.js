@@ -9,6 +9,7 @@ const FilterMiddleware = async (req, res, next) => {
     "/email/reset",
     "/email/verify",
   ];
+  console.log("Request path", req.path)
   if (openRoutes.includes(req.path)) {
     return next();
   }

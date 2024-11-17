@@ -1,12 +1,14 @@
 import dotenv from "dotenv";
 import express from "express";
-import GlobalRouter from "./routes/global.router.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import GlobalRouter from "./routes/global.router.js";
 import ErrorMiddleware from "./middlewares/error.middleware.js";
 
 dotenv.config();
 
 const app = express();
+app.use(cookieParser());
 
 app.use(express.static("upload"));
 app.use(express.json());
