@@ -11,7 +11,8 @@ const UserRouter = () => {
   router.get("/search", GetUsersController);
   router.patch("/:userId", UpdateUserController);
   router.get("/:userId", GetUserById);
-  // router.patch("/:userId/cover", UpdateUserController);
+  // router.patch("/:userId/cover/:profileId", UpdateUserController);
+  // router.post("/presigned-url", UpdateUserController);
 
   return router;
 };

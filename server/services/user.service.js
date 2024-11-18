@@ -118,8 +118,10 @@ class UserService {
       interests,
       size,
       page,
-      sort,
+      skip,
+      sorting,
     } = args;
+    console.log("query", { size, page, skip, sorting });
     const row = await pool.query(
       `SELECT *, date_part('year', age(birthday)) as formatted_age FROM "user" WHERE id = $1`,
       [userId]
@@ -145,7 +147,7 @@ class UserService {
     selectQuery += ";";
     console.log(selectQuery);
     const rows = await pool.query(selectQuery, values);
-    return rows.rows.map((obj) => ({
+    const data = rows.rows.map((obj) => ({
       id: obj.id,
       first_name: obj.first_name,
       last_name: obj.last_name,
@@ -159,7 +161,18 @@ class UserService {
       age: obj.age,
       distance: obj.distance,
     }));
+    return {
+      data,
+      pagination: {
+        count: 1,
+        page: 1,
+        size: 3,
+        total: 3,
+      },
+    };
   }
+
+  static async suggestionUsersBasedOnCriteria(userId, args) {}
 }
 
 export default UserService;
