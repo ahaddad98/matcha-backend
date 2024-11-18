@@ -2,6 +2,7 @@ import status from "http-status";
 import Exception from "../../errors/Exception.js";
 import AuthService from "../../services/auth.service.js";
 import Validate from "../../validators/validate.js";
+import logger from "../../log/logger.js";
 
 const RegisterController = async (req, res, next) => {
   try {
@@ -14,8 +15,15 @@ const RegisterController = async (req, res, next) => {
         errors
       );
     }
-    const { email, first_name, last_name, password, username, latitude, longitude } =
-      req.body;
+    const {
+      email,
+      first_name,
+      last_name,
+      password,
+      username,
+      latitude,
+      longitude,
+    } = req.body;
     const data = await AuthService.register({
       email,
       first_name,
@@ -23,10 +31,11 @@ const RegisterController = async (req, res, next) => {
       password,
       username,
       latitude,
-      longitude
+      longitude,
     });
     return res.status(201).json(data);
   } catch (error) {
+    logger.error("Error while register:", error);
     return next(error);
   }
 };

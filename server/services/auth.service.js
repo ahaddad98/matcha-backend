@@ -59,8 +59,8 @@ class AuthService {
   }
 
   static async register(args) {
-    const insertUser = `INSERT INTO "user" (first_name, last_name, username, email, password, latitude, longitude, verification_key, verification_end_date)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    const insertUser = `INSERT INTO "user" (first_name, last_name, username, email, password, location, verification_key, verification_end_date)
+    VALUES ($1, $2, $3, $4, $5, ST_SetSRID(ST_MakePoint($6, $7), 4326), $8, $9)
     RETURNING id, first_name, last_name, username, email;
     `;
     const {
@@ -91,19 +91,19 @@ class AuthService {
       username,
       email,
       hashPass,
-      latitude,
       longitude,
+      latitude,
       verification_key,
       verification_end_date,
     ]);
     const verifyUrl = `http://localhost:4000/api/auth/verify?token=${verification_key}`;
     logger.info("User created verify link", verifyUrl);
-    await MailService.sendEmail({
-      toEmail: email,
-      subject: "Account Activation",
-      content: `Please verify your account by clicking the following link: ${verifyUrl}`,
-    });
-    return user;
+    // await MailService.sendEmail({
+    //   toEmail: email,
+    //   subject: "Account Activation",
+    //   content: `Please verify your account by clicking the following link: ${verifyUrl}`,
+    // });
+    return user.rows[0];
   }
 
   static async verify(token) {
@@ -120,7 +120,8 @@ class AuthService {
           "token has been expired"
         );
       }
-      await pool.query(verifyUser, [user.id]);
+      const insertedRows = await pool.query(verifyUser, [user.id]);
+      return insertedRows.rows[0];
     } else {
       throw new Exception(
         HttpStatus.ACTIVATION_KEY_NOT_FOUND,

@@ -15,6 +15,15 @@ pool
     console.log(error);
   });
 
+const CreateMatchingStatus = `
+  DO $$
+BEGIN
+    IF NOT EXISTS ( SELECT 1 FROM pg_type WHERE typname = 'matchingstatus') THEN
+        CREATE TYPE MatchingStatus AS ENUM('LIKE', 'DISLIKE');
+    END IF;
+END$$;
+  `;
+
 const CreateGenderTypeQuery = `
 DO $$
 BEGIN
@@ -51,21 +60,62 @@ CREATE TABLE IF NOT EXISTS "user" (
     biography TEXT,
     default_cover TEXT,
     last_time_connected TIMESTAMPTZ,
-    latitude VARCHAR(255),
-    longitude VARCHAR(255),
     birthday DATE,
     token TEXT,
     refresh_token TEXT,
-    tags TAG[]
+    tags TAG[],
+    sexual_preference GenderType[],
+    location GEOGRAPHY(Point, 4326),
+    fame_rating INT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 `;
 
-const CreateSexualPreferences = ` CREATE TABLE IF NOT EXISTS SexualPreference (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER REFERENCES "user" (id),
-      preference GenderType NOT NULL
+const CreateVisitHistoryQuery = `
+CREATE TABLE IF NOT EXISTS visit_history (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES "user" (id),
+  visited_user_id INTEGER REFERENCES "user" (id),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 `;
+const CreateConnectedProfilesQuery = `
+CREATE TABLE IF NOT EXISTS connected_profile (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES "user" (id),
+  connected_user_id INTEGER REFERENCES "user" (id),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  connected BOOLEAN DEFAULT(false),
+  status  MatchingStatus
+);
+`;
+
+const CreateBlockedAccountQuery = `
+CREATE TABLE IF NOT EXISTS blocked_account (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES "user" (id),
+  blocked_user_id INTEGER REFERENCES "user" (id),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+`;
+
+const CreateConversationQuery = `
+CREATE TABLE IF NOT EXISTS conversation (
+  id SERIAL PRIMARY KEY,
+  sender_id INTEGER REFERENCES "user" (id),
+  reciever_id INTEGER REFERENCES "user" (id),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  message TEXT
+);
+`;
+
+
+// const CreateSexualPreferences = ` CREATE TABLE IF NOT EXISTS SexualPreference (
+//       id SERIAL PRIMARY KEY,
+//       user_id INTEGER REFERENCES "user" (id),
+//       preference GenderType NOT NULL
+// );
+// `;
 
 const CreateProfileQuery = `CREATE TABLE IF NOT EXISTS profile (
   id SERIAL PRIMARY KEY,
@@ -109,15 +159,6 @@ pool.query(CreateTagsQuery, (err, res) => {
   }
 });
 
-// PROFILE
-pool.query(CreateProfileQuery, (err, res) => {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log("Profile table created successfully");
-  }
-});
-
 // USER
 pool.query(createUserTableQuery, (err, res) => {
   if (err) {
@@ -127,22 +168,70 @@ pool.query(createUserTableQuery, (err, res) => {
   }
 });
 
-// SEXUAL_PREFERENCES
-pool.query(CreateSexualPreferences, (err, res) => {
+// MATCHING_STATUS
+pool.query(CreateMatchingStatus, (err, res) => {
   if (err) {
     console.error(err);
   } else {
-    console.log("Sexual Preference type created successfully");
+    console.log("MATCHING_STATUS enum created successfully");
+  }
+})
+
+// VisitHisotry
+pool.query(CreateVisitHistoryQuery, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("VisitHisotry table created successfully");
+  }
+})
+
+// ConnectedProfiles
+pool.query(CreateConnectedProfilesQuery, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("ConnectedProfiles table created successfully");
+  }
+})
+
+// BlockedAccount
+pool.query(CreateBlockedAccountQuery, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("BlockedAccount table created successfully");
+  }
+})
+
+// Conversation
+pool.query(CreateConversationQuery, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("Conversation table created successfully");
+  }
+})
+
+// PROFILE
+pool.query(CreateProfileQuery, (err, res) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("Profile table created successfully");
   }
 });
 
-// ALTER USER
-pool.query(`alter table "user" drop column if exists covers;`, (err, res) => {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log("Drop column covers from user table");
-  }
-});
+
+
+// PostGis
+// pool.query(CreatePostGisExtension, (err, res) => {
+//   if (err) {
+//     console.error(err);
+//   } else {
+//     console.log("postgis extension created successfully");
+//   }
+// });
+
 
 export default pool;
