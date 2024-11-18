@@ -109,14 +109,6 @@ CREATE TABLE IF NOT EXISTS conversation (
 );
 `;
 
-
-// const CreateSexualPreferences = ` CREATE TABLE IF NOT EXISTS SexualPreference (
-//       id SERIAL PRIMARY KEY,
-//       user_id INTEGER REFERENCES "user" (id),
-//       preference GenderType NOT NULL
-// );
-// `;
-
 const CreateProfileQuery = `CREATE TABLE IF NOT EXISTS profile (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES "user" (id),
